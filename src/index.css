@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Spotify風ダークテーマのグローバルスタイル */
+@layer base {
+  body {
+    @apply bg-spotify-dark text-white font-sans antialiased;
+    @apply selection:bg-spotify-green-500 selection:text-black;
+  }
+
+  /* スクロールバーのカスタマイズ */
+  ::-webkit-scrollbar {
+    @apply w-3;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-spotify-gray-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-spotify-gray-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-spotify-gray-500;
+  }
+
+  /* フォーカス時のアウトライン */
+  *:focus {
+    @apply outline-none ring-2 ring-spotify-green-500 ring-opacity-50;
+  }
+
+  /* リンクのデフォルトスタイル */
+  a {
+    @apply text-spotify-green-400 hover:text-spotify-green-300 transition-colors duration-200;
+  }
+
+  /* 入力フィールドのプレースホルダー */
+  ::placeholder {
+    @apply text-spotify-gray-400;
+  }
+}
+
+@layer components {
+  /* カスタムボタンスタイル */
+  .btn-primary {
+    @apply bg-spotify-green-500 hover:bg-spotify-green-400 text-black font-semibold py-3 px-6 rounded-full transition-all duration-200 transform hover:scale-105 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-spotify-gray-400 hover:border-white text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 hover:bg-white hover:text-black;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-spotify-gray-800 text-spotify-gray-300 hover:text-white font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  }
+
+  /* カードスタイル */
+  .card {
+    @apply bg-spotify-gray-800 rounded-xl p-6 shadow-spotify-lg hover:shadow-spotify-xl transition-all duration-300 hover:bg-spotify-gray-700;
+  }
+
+  .card-interactive {
+    @apply card cursor-pointer transform hover:scale-105 active:scale-95;
+  }
+
+  /* 入力フィールドスタイル */
+  .input-field {
+    @apply bg-spotify-gray-800 border border-spotify-gray-600 text-white placeholder-spotify-gray-400 rounded-lg px-4 py-3 focus:border-spotify-green-500 focus:bg-spotify-gray-700 transition-all duration-200;
+  }
+
+  /* テキストエリアスタイル */
+  .textarea-field {
+    @apply input-field resize-none;
+  }
+
+  /* グラデーション背景 */
+  .gradient-bg {
+    @apply bg-gradient-to-br from-spotify-gray-900 via-spotify-dark to-spotify-darker;
+  }
+
+  /* ガラスモーフィズム効果 */
+  .glass {
+    @apply bg-white bg-opacity-10 backdrop-blur-md border border-white border-opacity-20;
+  }
+
+  /* ホバーエフェクト付きアイコン */
+  .icon-hover {
+    @apply p-2 rounded-full hover:bg-spotify-gray-700 transition-colors duration-200 cursor-pointer;
+  }
+
+  /* ローディングスピナー */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-spotify-gray-600 border-t-spotify-green-500;
+  }
+
+  /* テキストグラデーション */
+  .text-gradient {
+    @apply bg-gradient-to-r from-spotify-green-400 to-spotify-blue-400 bg-clip-text text-transparent;
+  }
+
+  /* シャドウエフェクト */
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(29, 185, 84, 0.3);
+  }
+
+  /* アニメーション付きボーダー */
+  .border-animated {
+    @apply relative overflow-hidden;
+  }
+
+  .border-animated::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-spotify-green-500 to-transparent;
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
+
+@layer utilities {
+  /* カスタムユーティリティクラス */
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .backdrop-blur-xs {
+    backdrop-filter: blur(2px);
+  }
+
+  /* レスポンシブテキストサイズ */
+  .text-responsive-xl {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+
+  .text-responsive-lg {
+    @apply text-lg md:text-xl lg:text-2xl;
+  }
+
+  /* フレックスセンタリング */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  /* グリッドレスポンシブ */
+  .grid-responsive {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+
+  /* トランケート（省略）テキスト */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
