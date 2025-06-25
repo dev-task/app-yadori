@@ -31,7 +31,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Debounced search function
+  // サジェスト表示のためのデバウンス検索（地図は移動しない）
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
@@ -48,7 +48,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
     }
 
     debounceRef.current = setTimeout(() => {
-      searchAddresses(normalizedQuery)
+      searchAddressesForSuggestions(normalizedQuery)
     }, 300)
 
     return () => {
@@ -95,6 +95,9 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
           event.preventDefault()
           if (selectedIndex >= 0 && selectedIndex < results.length) {
             handleResultSelect(results[selectedIndex])
+          } else {
+            // Enterキーが押された場合、現在の入力で検索実行
+            handleSearchSubmit()
           }
           break
         case 'Escape':
@@ -111,9 +114,10 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
         document.removeEventListener('keydown', handleKeyDown)
       }
     }
-  }, [showResults, results, selectedIndex])
+  }, [showResults, results, selectedIndex, query])
 
-  const searchAddresses = async (searchQuery: string) => {
+  // サジェスト表示用の検索（地図は移動しない）
+  const searchAddressesForSuggestions = async (searchQuery: string) => {
     if (!searchQuery.trim()) return
 
     setIsLoading(true)
@@ -142,6 +146,44 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
     }
   }
 
+  // 検索実行（Enterキーまたは検索ボタン押下時）
+  const handleSearchSubmit = async () => {
+    const normalizedQuery = normalizeAddress(query)
+    
+    if (!validateAddress(normalizedQuery)) {
+      setError('有効な住所を入力してください')
+      setShowResults(true)
+      return
+    }
+
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const searchResults = await geocodeAddress(normalizedQuery, {
+        country: 'JP',
+        language: 'ja',
+        limit: 1, // 最初の結果のみを使用
+        proximity: [139.7671, 35.6812],
+        types: ['address', 'poi', 'place']
+      })
+      
+      if (searchResults.length > 0) {
+        handleResultSelect(searchResults[0])
+      } else {
+        setError('該当する住所が見つかりませんでした')
+        setShowResults(true)
+      }
+    } catch (error: any) {
+      console.error('Address search error:', error)
+      const errorMessage = handleGeocodingError(error)
+      setError(errorMessage)
+      setShowResults(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleResultSelect = (result: GeocodingResult) => {
     const [longitude, latitude] = result.center
     setQuery(result.place_name)
@@ -149,6 +191,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
     setError('')
     setSelectedIndex(-1)
     
+    // 地図を移動させる
     onLocationSelect({
       address: result.place_name,
       latitude,
@@ -174,6 +217,11 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value)
     setSelectedIndex(-1)
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleSearchSubmit()
   }
 
   const getCategoryIcon = (result: GeocodingResult) => {
@@ -208,7 +256,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
 
   return (
     <div ref={searchRef} className={`relative ${className}`}>
-      <div className="relative">
+      <form onSubmit={handleFormSubmit} className="relative">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           {isLoading ? (
             <Loader className="h-5 w-5 text-spotify-green-400 animate-spin" />
@@ -224,22 +272,33 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           placeholder={placeholder || t('map.searchPlaceholder')}
-          className="input-field pl-12 pr-12 w-full"
+          className="input-field pl-12 pr-20 w-full"
           disabled={isLoading}
           autoComplete="off"
           spellCheck="false"
         />
         
-        {query && (
+        <div className="absolute inset-y-0 right-0 flex items-center space-x-1 pr-2">
+          {query && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="p-1 text-spotify-gray-400 hover:text-white transition-colors rounded"
+              tabIndex={-1}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+          
           <button
-            onClick={handleClear}
-            className="absolute inset-y-0 right-0 pr-4 flex items-center text-spotify-gray-400 hover:text-white transition-colors"
-            tabIndex={-1}
+            type="submit"
+            disabled={isLoading || !query.trim()}
+            className="px-3 py-1 bg-spotify-green-500 hover:bg-spotify-green-400 disabled:bg-spotify-gray-600 disabled:cursor-not-allowed text-black text-sm font-medium rounded transition-colors"
           >
-            <X className="h-5 w-5" />
+            検索
           </button>
-        )}
-      </div>
+        </div>
+      </form>
 
       {/* Search Results Dropdown */}
       {showResults && (
@@ -268,6 +327,11 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
             </div>
           ) : (
             <div className="py-2">
+              <div className="px-4 py-2 border-b border-spotify-gray-700">
+                <p className="text-spotify-gray-400 text-xs">
+                  候補を選択するか、Enterキーで検索してください
+                </p>
+              </div>
               {results.map((result, index) => (
                 <button
                   key={result.id || index}
