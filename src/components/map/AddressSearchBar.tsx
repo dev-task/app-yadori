@@ -27,6 +27,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
   const [showResults, setShowResults] = useState(false)
   const [error, setError] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(-1)
+  const [isComposing, setIsComposing] = useState(false) // IME入力中かどうか
   const debounceRef = useRef<NodeJS.Timeout>()
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -35,6 +36,11 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
+    }
+
+    // IME入力中は検索を実行しない
+    if (isComposing) {
+      return
     }
 
     const normalizedQuery = normalizeAddress(query)
@@ -56,7 +62,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
         clearTimeout(debounceRef.current)
       }
     }
-  }, [query])
+  }, [query, isComposing]) // isComposingを依存配列に追加
 
   // Close results when clicking outside
   useEffect(() => {
@@ -76,7 +82,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!showResults || results.length === 0) return
+      if (!showResults || results.length === 0 || isComposing) return
 
       switch (event.key) {
         case 'ArrowDown':
@@ -114,7 +120,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
         document.removeEventListener('keydown', handleKeyDown)
       }
     }
-  }, [showResults, results, selectedIndex, query])
+  }, [showResults, results, selectedIndex, query, isComposing])
 
   // サジェスト表示用の検索（地図は移動しない）
   const searchAddressesForSuggestions = async (searchQuery: string) => {
@@ -221,7 +227,19 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    handleSearchSubmit()
+    // IME入力中は検索を実行しない
+    if (!isComposing) {
+      handleSearchSubmit()
+    }
+  }
+
+  // IME関連のイベントハンドラー
+  const handleCompositionStart = () => {
+    setIsComposing(true)
+  }
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false)
   }
 
   const getCategoryIcon = (result: GeocodingResult) => {
@@ -271,6 +289,8 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
           value={query}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
           placeholder={placeholder || t('map.searchPlaceholder')}
           className="input-field pl-12 pr-20 w-full"
           disabled={isLoading}
@@ -292,7 +312,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
           
           <button
             type="submit"
-            disabled={isLoading || !query.trim()}
+            disabled={isLoading || !query.trim() || isComposing}
             className="px-3 py-1 bg-spotify-green-500 hover:bg-spotify-green-400 disabled:bg-spotify-gray-600 disabled:cursor-not-allowed text-black text-sm font-medium rounded transition-colors"
           >
             検索
@@ -381,7 +401,7 @@ export const AddressSearchBar: React.FC<AddressSearchBarProps> = ({
       )}
 
       {/* Search hints */}
-      {query.length > 0 && query.length < 2 && !isLoading && (
+      {query.length > 0 && query.length < 2 && !isLoading && !isComposing && (
         <div className="absolute top-full mt-2 w-full bg-spotify-gray-800 border border-spotify-gray-600 rounded-xl shadow-spotify-lg z-10">
           <div className="p-4 text-center">
             <p className="text-spotify-gray-400 text-sm">
