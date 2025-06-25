@@ -1,0 +1,46 @@
+{
+  "name": "@yadori/mobile",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build": "expo export",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^14.0.0",
+    "@react-navigation/native": "^6.1.9",
+    "@tamagui/animations-react-native": "^1.87.0",
+    "@tamagui/config": "^1.87.0",
+    "@tamagui/core": "^1.87.0",
+    "@yadori/logic": "workspace:*",
+    "@yadori/ui": "workspace:*",
+    "expo": "~50.0.0",
+    "expo-constants": "~15.4.0",
+    "expo-linking": "~6.2.0",
+    "expo-router": "~3.4.0",
+    "expo-splash-screen": "~0.26.0",
+    "expo-status-bar": "~1.11.0",
+    "react": "18.2.0",
+    "react-native": "0.73.0",
+    "react-native-gesture-handler": "~2.14.0",
+    "react-native-reanimated": "~3.6.0",
+    "react-native-safe-area-context": "4.8.2",
+    "react-native-screens": "~3.29.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.2.45",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "typescript": "~5.3.3"
+  },
+  "private": true
+}

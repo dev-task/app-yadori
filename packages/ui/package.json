@@ -1,0 +1,41 @@
+{
+  "name": "@yadori/ui",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --external react",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --external react --watch",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tamagui/animations-react-native": "^1.87.0",
+    "@tamagui/config": "^1.87.0",
+    "@tamagui/core": "^1.87.0",
+    "@tamagui/font-inter": "^1.87.0",
+    "@tamagui/shorthands": "^1.87.0",
+    "@tamagui/themes": "^1.87.0",
+    "@tamagui/tokens": "^1.87.0",
+    "lucide-react": "^0.344.0",
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "eslint": "^8.48.0",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
+}
