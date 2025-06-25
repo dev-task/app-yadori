@@ -1,4 +1,4 @@
-# Yadori - 住まいの口コミSNS / Housing Review Social Network
+# Yadori - 住まい口コミSNS (モノレポ版)
 
 [English](#english) | [日本語](#japanese)
 
@@ -7,10 +7,11 @@
 
 ### 📝 プロジェクト概要
 
-Yadoriは、実際に住んだ経験をもとに、リアルな住まい情報を共有・発見できるプラットフォームです。ユーザーは住まいのレビューを投稿し、他のユーザーはそれらのレビューを検索・閲覧することができます。住まい探しをより良い体験にするためのSNSアプリケーションです。
+Yadoriは、実際に住んだ経験をもとに、リアルな住まい情報を共有・発見できるプラットフォームです。Webアプリとモバイルアプリをモノレポ構成で開発し、コードの再利用性と開発効率を最大化しています。
 
 ### ✨ 主な機能
 
+#### 共通機能（Web・Mobile両対応）
 - **ユーザー認証**: 登録・ログイン機能
 - **レビュー投稿**: 住まいの評価、コメント、写真のアップロード
 - **地図からの住所選択**: Mapboxを使用した直感的な位置選択
@@ -21,55 +22,46 @@ Yadoriは、実際に住んだ経験をもとに、リアルな住まい情報�
 - **多言語対応**: 日本語と英語のサポート
 - **レスポンシブデザイン**: モバイルからデスクトップまで対応
 
+#### Mobile専用機能
+- **プッシュ通知**: いいね・コメント通知をリアルタイムで受信
+- **リアルタイム機能**: いいね・コメントの即座反映
+- **ネイティブ地図表示**: React Native Maps使用
+- **カメラ・ギャラリー連携**: 写真撮影・選択機能
+
 ### 🛠️ 技術スタック
 
-- **フロントエンド**: 
-  - React 18
-  - TypeScript
-  - Tailwind CSS
-  - Vite (ビルドツール)
-  - React Router DOM (ルーティング)
-  - React i18next (国際化)
-  - Lucide React (アイコン)
-  - Mapbox GL JS (地図機能)
+#### モノレポ管理
+- **Turborepo**: 効率的なビルドとキャッシュ管理
 
-- **バックエンド**: 
-  - Supabase (BaaS)
-    - PostgreSQL (データベース)
-    - Supabase Auth (認証)
-    - Supabase Storage (ストレージ)
-    - Auto-generated REST API
+#### フロントエンド
+- **Web**: Vite + React + TypeScript + Tailwind CSS
+- **Mobile**: React Native + Expo + TypeScript
+- **共通UI**: Tamagui (Web・Mobile両対応)
 
-### 🔧 Supabase設定
+#### バックエンド・サービス
+- **BaaS**: Supabase (PostgreSQL, Auth, Storage, Functions, Realtime)
+- **地図**: Mapbox GL JS, Mapbox Geocoding API
+- **プッシュ通知**: Expo Push Notification Service
+- **国際化**: React i18next
 
-Supabaseは、このプロジェクトのバックエンドとして使用されています。以下の機能を提供しています：
+### 🏗️ プロジェクト構造
 
-1. **認証 (Auth)**
-   - メールアドレス/パスワードによるユーザー認証
-   - セッション管理
-   - ユーザープロフィール情報の保存
+```
+yadori-monorepo/
+├── apps/
+│   ├── web/                 # Webアプリケーション (Vite + React)
+│   └── mobile/              # モバイルアプリ (React Native + Expo)
+├── packages/
+│   ├── ui/                  # 共有UIライブラリ (Tamagui)
+│   └── logic/               # 共有ビジネスロジック
+├── supabase/
+│   ├── migrations/          # データベースマイグレーション
+│   └── functions/           # Edge Functions (プッシュ通知)
+├── package.json             # ルートパッケージ設定
+└── turbo.json              # Turborepo設定
+```
 
-2. **データベース (Database)**
-   - PostgreSQLデータベース
-   - Row Level Security (RLS) によるデータアクセス制御
-   - リアルタイムサブスクリプション
-
-3. **ストレージ (Storage)**
-   - レビュー画像の保存
-   - アクセス制御とセキュリティルール
-
-4. **API**
-   - 自動生成されたRESTful API
-   - クライアントライブラリによる簡単なアクセス
-
-Supabaseプロジェクトを設定するには：
-
-1. [Supabase](https://supabase.com/)でアカウントを作成
-2. 新しいプロジェクトを作成
-3. `supabase/migrations`ディレクトリ内のSQLスクリプトを実行してデータベーススキーマを設定
-4. プロジェクトURLと匿名キーを`.env`ファイルに設定
-
-### 🚀 セットアップ方法
+### 🔧 セットアップ方法
 
 #### 前提条件
 
@@ -77,20 +69,19 @@ Supabaseプロジェクトを設定するには：
 - npm または yarn
 - Supabaseアカウント
 - Mapbox APIキー
+- Expo CLI (モバイル開発用)
 
 #### インストール手順
 
 1. リポジトリをクローンする
    ```bash
-   git clone https://github.com/yourusername/yadori.git
-   cd yadori
+   git clone https://github.com/yourusername/yadori-monorepo.git
+   cd yadori-monorepo
    ```
 
 2. 依存関係をインストールする
    ```bash
    npm install
-   # または
-   yarn install
    ```
 
 3. 環境変数を設定する
@@ -104,25 +95,39 @@ Supabaseプロジェクトを設定するには：
      - `VITE_MAPBOX_ACCESS_TOKEN`: MapboxのアクセストークンAPI
 
 4. 開発サーバーを起動する
+
+   **全体の開発サーバー起動:**
    ```bash
    npm run dev
-   # または
-   yarn dev
    ```
 
-5. ブラウザで http://localhost:5173 にアクセスする
+   **個別アプリの開発:**
+   ```bash
+   # Webアプリのみ
+   npm run dev --filter=@yadori/web
+   
+   # モバイルアプリのみ
+   npm run dev --filter=@yadori/mobile
+   ```
+
+5. ブラウザで http://localhost:5173 にアクセス（Web）
+   モバイルアプリはExpo Goアプリで開発サーバーに接続
 
 #### ビルド方法
 
-本番環境用のビルドを作成するには:
-
+**全体のビルド:**
 ```bash
 npm run build
-# または
-yarn build
 ```
 
-ビルドされたファイルは `dist` ディレクトリに生成されます。
+**個別ビルド:**
+```bash
+# Webアプリのビルド
+npm run build --filter=@yadori/web
+
+# モバイルアプリのビルド（Expo）
+cd apps/mobile && expo build
+```
 
 ### 📊 データベース構造
 
@@ -131,32 +136,19 @@ yarn build
 - **review_images**: レビュー画像
 - **comments**: コメントデータ
 - **likes**: いいね情報
+- **user_devices**: プッシュ通知用デバイス情報
 
-### 📁 プロジェクト構造
+### 🔔 プッシュ通知システム
 
-```
-src/
-├── components/       # 再利用可能なUIコンポーネント
-│   ├── Layout.tsx    # アプリケーションのレイアウト
-│   ├── auth/         # 認証関連コンポーネント
-│   └── map/          # 地図関連コンポーネント
-├── contexts/         # Reactコンテキスト
-│   ├── AuthContext.tsx  # 認証状態管理
-│   └── I18nContext.tsx  # 国際化コンテキスト
-├── i18n/             # 国際化リソース
-│   ├── index.ts      # i18n設定
-│   └── locales/      # 翻訳ファイル
-│       ├── ja.json   # 日本語翻訳
-│       └── en.json   # 英語翻訳
-├── lib/              # ユーティリティライブラリ
-├── pages/            # アプリケーションのページ
-│   ├── HomePage.tsx  # ホームページ
-│   ├── PostPage.tsx  # 投稿ページ
-│   └── ...           # その他のページ
-├── utils/            # ユーティリティ関数
-├── App.tsx           # メインアプリケーションコンポーネント
-└── main.tsx          # アプリケーションのエントリーポイント
-```
+モバイルアプリでは、以下の通知を受信できます：
+
+1. **いいね通知**: 自分のレビューにいいねがついた時
+2. **コメント通知**: 自分のレビューにコメントがついた時
+
+#### 通知フロー
+1. モバイルアプリ起動時にプッシュトークンを取得・登録
+2. いいね・コメント投稿時にSupabase Edge Functionがトリガー
+3. Expo Push Serviceを通じて通知配信
 
 ### 🌍 多言語対応
 
@@ -165,41 +157,46 @@ src/
 #### 言語ファイル
 
 翻訳ファイルは以下の場所にあります：
-- 日本語: `src/i18n/locales/ja.json`
-- 英語: `src/i18n/locales/en.json`
+- 日本語: `packages/logic/src/locales/ja.json`
+- 英語: `packages/logic/src/locales/en.json`
 
-#### 言語切り替え
+### 🚀 デプロイメント
 
-アプリケーション内で言語を切り替えることができます。言語設定はローカルストレージに保存され、次回のアクセス時に自動的に適用されます。
+#### Web版
+- **プラットフォーム**: Netlify
+- **ビルドコマンド**: `npm run build --filter=@yadori/web`
+- **公開ディレクトリ**: `apps/web/dist`
 
-#### 新しい言語の追加方法
+#### Mobile版
+- **ビルドサービス**: Expo Application Services (EAS)
+- **配信**: App Store, Google Play Store
 
-1. `src/i18n/locales/`に新しい言語ファイル（例：`fr.json`）を作成
-2. `src/i18n/index.ts`に新しい言語を追加
-3. 言語切り替えUIに新しい言語オプションを追加
+```bash
+# EAS設定
+cd apps/mobile
+eas build --platform all
 
-#### 翻訳の使用例
-
-```tsx
-import { useTranslation } from 'react-i18next';
-
-function MyComponent() {
-  const { t } = useTranslation();
-  
-  return (
-    <div>
-      <h1>{t('home.title')}</h1>
-      <p>{t('home.subtitle')}</p>
-    </div>
-  );
-}
+# 配信
+eas submit --platform all
 ```
 
-### 🌐 デプロイ
+### 📝 開発コマンド
 
-フロントエンドは Netlify などの静的サイトホスティングサービスにデプロイすることができます。
+```bash
+# 全体の開発
+npm run dev
 
-### 📝 コントリビューション
+# 型チェック
+npm run type-check
+
+# リント
+npm run lint
+
+# クリーンビルド
+npm run clean && npm run build
+```
+
+### 🤝 コントリビューション
 
 プロジェクトへの貢献は歓迎します。以下の手順に従ってください:
 
@@ -220,10 +217,11 @@ function MyComponent() {
 
 ### 📝 Project Overview
 
-Yadori is a platform where users can share and discover real housing information based on actual living experiences. Users can post reviews of their housing, and others can search and browse these reviews. It's a social networking application designed to make house hunting a better experience.
+Yadori is a platform where users can share and discover real housing information based on actual living experiences. Developed as a monorepo with Web and Mobile applications to maximize code reusability and development efficiency.
 
 ### ✨ Key Features
 
+#### Common Features (Web & Mobile)
 - **User Authentication**: Registration and login functionality
 - **Review Posting**: Housing evaluations, comments, and photo uploads
 - **Map-based Address Selection**: Intuitive location selection using Mapbox
@@ -234,55 +232,46 @@ Yadori is a platform where users can share and discover real housing information
 - **Multilingual Support**: Japanese and English languages
 - **Responsive Design**: Works from mobile to desktop
 
+#### Mobile-Exclusive Features
+- **Push Notifications**: Real-time notifications for likes and comments
+- **Real-time Features**: Instant reflection of likes and comments
+- **Native Map Display**: Using React Native Maps
+- **Camera & Gallery Integration**: Photo capture and selection
+
 ### 🛠️ Technology Stack
 
-- **Frontend**: 
-  - React 18
-  - TypeScript
-  - Tailwind CSS
-  - Vite (build tool)
-  - React Router DOM (routing)
-  - React i18next (internationalization)
-  - Lucide React (icons)
-  - Mapbox GL JS (map functionality)
+#### Monorepo Management
+- **Turborepo**: Efficient build and cache management
 
-- **Backend**: 
-  - Supabase (BaaS)
-    - PostgreSQL (database)
-    - Supabase Auth (authentication)
-    - Supabase Storage (storage)
-    - Auto-generated REST API
+#### Frontend
+- **Web**: Vite + React + TypeScript + Tailwind CSS
+- **Mobile**: React Native + Expo + TypeScript
+- **Shared UI**: Tamagui (Web & Mobile compatible)
 
-### 🔧 Supabase Configuration
+#### Backend & Services
+- **BaaS**: Supabase (PostgreSQL, Auth, Storage, Functions, Realtime)
+- **Maps**: Mapbox GL JS, Mapbox Geocoding API
+- **Push Notifications**: Expo Push Notification Service
+- **Internationalization**: React i18next
 
-Supabase is used as the backend for this project. It provides the following features:
+### 🏗️ Project Structure
 
-1. **Authentication (Auth)**
-   - Email/password user authentication
-   - Session management
-   - User profile information storage
+```
+yadori-monorepo/
+├── apps/
+│   ├── web/                 # Web Application (Vite + React)
+│   └── mobile/              # Mobile App (React Native + Expo)
+├── packages/
+│   ├── ui/                  # Shared UI Library (Tamagui)
+│   └── logic/               # Shared Business Logic
+├── supabase/
+│   ├── migrations/          # Database Migrations
+│   └── functions/           # Edge Functions (Push Notifications)
+├── package.json             # Root Package Configuration
+└── turbo.json              # Turborepo Configuration
+```
 
-2. **Database**
-   - PostgreSQL database
-   - Row Level Security (RLS) for data access control
-   - Real-time subscriptions
-
-3. **Storage**
-   - Review image storage
-   - Access control and security rules
-
-4. **API**
-   - Auto-generated RESTful API
-   - Easy access via client libraries
-
-To set up a Supabase project:
-
-1. Create an account on [Supabase](https://supabase.com/)
-2. Create a new project
-3. Run the SQL scripts in the `supabase/migrations` directory to set up the database schema
-4. Set the project URL and anonymous key in your `.env` file
-
-### 🚀 Setup Instructions
+### 🔧 Setup Instructions
 
 #### Prerequisites
 
@@ -290,20 +279,19 @@ To set up a Supabase project:
 - npm or yarn
 - Supabase account
 - Mapbox API key
+- Expo CLI (for mobile development)
 
 #### Installation Steps
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/yadori.git
-   cd yadori
+   git clone https://github.com/yourusername/yadori-monorepo.git
+   cd yadori-monorepo
    ```
 
 2. Install dependencies
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
 3. Set up environment variables
@@ -316,26 +304,41 @@ To set up a Supabase project:
      - `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key
      - `VITE_MAPBOX_ACCESS_TOKEN`: Your Mapbox access token API
 
-4. Start the development server
+4. Start the development servers
+
+   **Start all development servers:**
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
-5. Access the application in your browser at http://localhost:5173
+   **Individual app development:**
+   ```bash
+   # Web app only
+   npm run dev --filter=@yadori/web
+   
+   # Mobile app only
+   npm run dev --filter=@yadori/mobile
+   ```
+
+5. Access the application
+   - Web: http://localhost:5173
+   - Mobile: Connect to development server via Expo Go app
 
 #### Build Instructions
 
-To create a production build:
-
+**Build all:**
 ```bash
 npm run build
-# or
-yarn build
 ```
 
-The built files will be generated in the `dist` directory.
+**Individual builds:**
+```bash
+# Web app build
+npm run build --filter=@yadori/web
+
+# Mobile app build (Expo)
+cd apps/mobile && expo build
+```
 
 ### 📊 Database Structure
 
@@ -344,32 +347,19 @@ The built files will be generated in the `dist` directory.
 - **review_images**: Review images
 - **comments**: Comment data
 - **likes**: Like information
+- **user_devices**: Device information for push notifications
 
-### 📁 Project Structure
+### 🔔 Push Notification System
 
-```
-src/
-├── components/       # Reusable UI components
-│   ├── Layout.tsx    # Application layout
-│   ├── auth/         # Authentication-related components
-│   └── map/          # Map-related components
-├── contexts/         # React contexts
-│   ├── AuthContext.tsx  # Authentication state management
-│   └── I18nContext.tsx  # Internationalization context
-├── i18n/             # Internationalization resources
-│   ├── index.ts      # i18n configuration
-│   └── locales/      # Translation files
-│       ├── ja.json   # Japanese translations
-│       └── en.json   # English translations
-├── lib/              # Utility libraries
-├── pages/            # Application pages
-│   ├── HomePage.tsx  # Home page
-│   ├── PostPage.tsx  # Post page
-│   └── ...           # Other pages
-├── utils/            # Utility functions
-├── App.tsx           # Main application component
-└── main.tsx          # Application entry point
-```
+The mobile app can receive the following notifications:
+
+1. **Like Notifications**: When someone likes your review
+2. **Comment Notifications**: When someone comments on your review
+
+#### Notification Flow
+1. Push token acquisition and registration on mobile app startup
+2. Supabase Edge Function triggers on like/comment posting
+3. Notification delivery through Expo Push Service
 
 ### 🌍 Internationalization
 
@@ -378,41 +368,46 @@ This application supports both Japanese and English using `react-i18next`.
 #### Language Files
 
 Translation files are located at:
-- Japanese: `src/i18n/locales/ja.json`
-- English: `src/i18n/locales/en.json`
+- Japanese: `packages/logic/src/locales/ja.json`
+- English: `packages/logic/src/locales/en.json`
 
-#### Language Switching
+### 🚀 Deployment
 
-You can switch languages within the application. Language settings are saved in local storage and automatically applied on subsequent visits.
+#### Web Version
+- **Platform**: Netlify
+- **Build Command**: `npm run build --filter=@yadori/web`
+- **Publish Directory**: `apps/web/dist`
 
-#### Adding a New Language
+#### Mobile Version
+- **Build Service**: Expo Application Services (EAS)
+- **Distribution**: App Store, Google Play Store
 
-1. Create a new language file in `src/i18n/locales/` (e.g., `fr.json`)
-2. Add the new language to `src/i18n/index.ts`
-3. Add the new language option to the language switcher UI
+```bash
+# EAS setup
+cd apps/mobile
+eas build --platform all
 
-#### Translation Usage Example
-
-```tsx
-import { useTranslation } from 'react-i18next';
-
-function MyComponent() {
-  const { t } = useTranslation();
-  
-  return (
-    <div>
-      <h1>{t('home.title')}</h1>
-      <p>{t('home.subtitle')}</p>
-    </div>
-  );
-}
+# Submit
+eas submit --platform all
 ```
 
-### 🌐 Deployment
+### 📝 Development Commands
 
-The frontend can be deployed to static site hosting services like Netlify.
+```bash
+# Development for all
+npm run dev
 
-### 📝 Contributing
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+
+# Clean build
+npm run clean && npm run build
+```
+
+### 🤝 Contributing
 
 Contributions to the project are welcome. Please follow these steps:
 

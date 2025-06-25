@@ -40,6 +40,7 @@ export const usePushNotifications = () => {
     // Listen for incoming notifications
     const notificationListener = Notifications.addNotificationReceivedListener(notification => {
       setPushState(prev => ({ ...prev, notification }))
+      console.log('Notification received:', notification)
     })
 
     // Listen for notification interactions
@@ -48,9 +49,10 @@ export const usePushNotifications = () => {
       
       // Handle notification tap
       if (data?.type === 'like' || data?.type === 'comment') {
-        // Navigate to review detail page
+        console.log('Notification tapped - Navigate to review:', data.reviewId)
+        // TODO: Implement navigation to review detail page
         // This would need to be implemented with your navigation system
-        console.log('Navigate to review:', data.reviewId)
+        // Example: router.push(`/review/${data.reviewId}`)
       }
     })
 
@@ -61,43 +63,58 @@ export const usePushNotifications = () => {
   }, [])
 
   const registerForPushNotificationsAsync = async () => {
-    if (!user) return
+    if (!user) {
+      console.log('No user found, skipping push notification registration')
+      return
+    }
 
     try {
       if (!Device.isDevice) {
+        const errorMsg = 'Must use physical device for Push Notifications'
+        console.warn(errorMsg)
         setPushState(prev => ({ 
           ...prev, 
-          error: 'Must use physical device for Push Notifications' 
+          error: errorMsg 
         }))
         return
       }
 
+      // Check existing permissions
       const { status: existingStatus } = await Notifications.getPermissionsAsync()
       let finalStatus = existingStatus
 
+      // Request permissions if not granted
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync()
         finalStatus = status
       }
 
       if (finalStatus !== 'granted') {
+        const errorMsg = 'Push notification permission denied'
+        console.warn(errorMsg)
         setPushState(prev => ({ 
           ...prev, 
-          error: 'Failed to get push token for push notification!' 
+          error: errorMsg 
         }))
         return
       }
 
+      // Get Expo push token
+      const projectId = process.env.EXPO_PUBLIC_PROJECT_ID || 'yadori-mobile-app'
       const token = await Notifications.getExpoPushTokenAsync({
-        projectId: process.env.EXPO_PUBLIC_PROJECT_ID || 'your-project-id'
+        projectId
       })
 
+      console.log('Expo push token obtained:', token.data)
+
+      // Configure Android notification channel
       if (Platform.OS === 'android') {
-        Notifications.setNotificationChannelAsync('default', {
-          name: 'default',
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'Default',
           importance: Notifications.AndroidImportance.MAX,
           vibrationPattern: [0, 250, 250, 250],
-          lightColor: '#FF231F7C',
+          lightColor: '#1db954',
+          sound: 'default',
         })
       }
 
@@ -111,6 +128,8 @@ export const usePushNotifications = () => {
         error: null
       }))
 
+      console.log('Push notifications registered successfully')
+
     } catch (error: any) {
       console.error('Error registering for push notifications:', error)
       setPushState(prev => ({ 
@@ -121,10 +140,14 @@ export const usePushNotifications = () => {
   }
 
   const saveTokenToDatabase = async (token: string) => {
-    if (!user) return
+    if (!user) {
+      throw new Error('No user found')
+    }
 
     try {
       const deviceType = Platform.OS === 'ios' ? 'ios' : 'android'
+      
+      console.log('Saving push token to database:', { token, userId: user.id, deviceType })
       
       // Upsert the device token
       const { error } = await supabase
@@ -144,7 +167,7 @@ export const usePushNotifications = () => {
         throw error
       }
 
-      console.log('Push token saved successfully')
+      console.log('Push token saved successfully to database')
     } catch (error) {
       console.error('Failed to save push token to database:', error)
       throw error
@@ -152,9 +175,14 @@ export const usePushNotifications = () => {
   }
 
   const unregisterDevice = async () => {
-    if (!user || !pushState.expoPushToken) return
+    if (!user || !pushState.expoPushToken) {
+      console.log('No user or token found for unregistration')
+      return
+    }
 
     try {
+      console.log('Unregistering device:', pushState.expoPushToken)
+      
       const { error } = await supabase
         .from('user_devices')
         .update({ active: false })
@@ -168,14 +196,40 @@ export const usePushNotifications = () => {
         isRegistered: false,
         expoPushToken: null
       }))
+
+      console.log('Device unregistered successfully')
     } catch (error) {
       console.error('Error unregistering device:', error)
+    }
+  }
+
+  const testNotification = async () => {
+    if (!pushState.expoPushToken) {
+      console.warn('No push token available for testing')
+      return
+    }
+
+    try {
+      // Send a test notification
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "テスト通知",
+          body: "プッシュ通知が正常に動作しています！",
+          data: { type: 'test' },
+        },
+        trigger: { seconds: 1 },
+      })
+
+      console.log('Test notification scheduled')
+    } catch (error) {
+      console.error('Error sending test notification:', error)
     }
   }
 
   return {
     ...pushState,
     registerForPushNotifications: registerForPushNotificationsAsync,
-    unregisterDevice
+    unregisterDevice,
+    testNotification
   }
 }

@@ -73,7 +73,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "yadori-mobile-app"
       }
     }
   }
