@@ -13,12 +13,14 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Sliders
+  Sliders,
+  Plus
 } from 'lucide-react'
 import { useI18n } from '../contexts/I18nContext'
 import { supabase } from '../lib/supabase'
 import { Database } from '../lib/database.types'
 import { ReviewCard } from '../components/ReviewCard'
+import { Card, Button } from '../components/ui'
 
 type Review = Database['public']['Tables']['reviews']['Row'] & {
   users: {
@@ -272,7 +274,7 @@ export const ReviewListPage: React.FC = () => {
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-lg bg-spotify-gray-800 border border-spotify-gray-600 text-spotify-gray-300 hover:bg-spotify-gray-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -280,14 +282,14 @@ export const ReviewListPage: React.FC = () => {
         {getPageNumbers().map((page, index) => (
           <React.Fragment key={index}>
             {page === '...' ? (
-              <span className="px-3 py-2 text-gray-500">...</span>
+              <span className="px-3 py-2 text-spotify-gray-500">...</span>
             ) : (
               <button
                 onClick={() => handlePageChange(page as number)}
                 className={`px-3 py-2 rounded-lg transition-colors ${
                   currentPage === page
-                    ? 'bg-blue-600 text-white'
-                    : 'border border-gray-300 hover:bg-gray-50'
+                    ? 'bg-spotify-green-500 text-black font-semibold'
+                    : 'bg-spotify-gray-800 border border-spotify-gray-600 text-spotify-gray-300 hover:bg-spotify-gray-700 hover:text-white'
                 }`}
               >
                 {page}
@@ -299,7 +301,7 @@ export const ReviewListPage: React.FC = () => {
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-lg bg-spotify-gray-800 border border-spotify-gray-600 text-spotify-gray-300 hover:bg-spotify-gray-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -308,41 +310,47 @@ export const ReviewListPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('search.title')}</h1>
-            <p className="text-gray-600 mt-1">
-              {totalCount > 0 ? `${totalCount}${t('search.resultsFound')}` : t('search.noResults')}
-            </p>
-          </div>
-          
-          {/* Search form */}
-          <form onSubmit={handleSearch} className="flex space-x-2 lg:w-96">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('search.searchPlaceholder')}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+      <Card padding="lg" className="relative overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-spotify-green-500 via-spotify-blue-500 to-spotify-purple-500 opacity-10"></div>
+        
+        <div className="relative">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold text-white">{t('search.title')}</h1>
+              <p className="text-spotify-gray-300 mt-1">
+                {totalCount > 0 ? `${totalCount}${t('search.resultsFound')}` : t('search.noResults')}
+              </p>
             </div>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              {t('search.searchButton')}
-            </button>
-          </form>
+            
+            {/* Search form */}
+            <form onSubmit={handleSearch} className="flex space-x-2 lg:w-96">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-spotify-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('search.searchPlaceholder')}
+                  className="input-field pl-12 w-full"
+                />
+              </div>
+              <Button
+                type="submit"
+                variant="primary"
+                icon={Search}
+              >
+                {t('search.searchButton')}
+              </Button>
+            </form>
+          </div>
         </div>
-      </div>
+      </Card>
 
       {/* Controls */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <Card>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-4">
             {/* Sort dropdown */}
@@ -350,7 +358,7 @@ export const ReviewListPage: React.FC = () => {
               <select
                 value={sortBy}
                 onChange={(e) => handleSortChange(e.target.value as SortOption)}
-                className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="appearance-none bg-spotify-gray-800 border border-spotify-gray-600 text-white rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-spotify-green-500 focus:border-transparent hover:bg-spotify-gray-700 transition-colors"
               >
                 <option value="newest">{t('search.sortOptions.newest')}</option>
                 <option value="oldest">{t('search.sortOptions.oldest')}</option>
@@ -359,23 +367,23 @@ export const ReviewListPage: React.FC = () => {
                 <option value="rent_high">{t('search.sortOptions.rentHigh')}</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                <SortAsc className="h-4 w-4 text-gray-400" />
+                <SortAsc className="h-4 w-4 text-spotify-gray-400" />
               </div>
             </div>
 
             {/* Filter button */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all duration-200 ${
                 hasActiveFilters()
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-300 hover:bg-gray-50'
+                  ? 'border-spotify-green-500 bg-spotify-green-500 bg-opacity-20 text-spotify-green-400'
+                  : 'border-spotify-gray-600 bg-spotify-gray-800 text-spotify-gray-300 hover:bg-spotify-gray-700 hover:text-white'
               }`}
             >
               <Sliders className="h-4 w-4" />
               <span>{t('search.filters')}</span>
               {hasActiveFilters() && (
-                <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-spotify-green-500 text-black text-xs px-2 py-0.5 rounded-full font-semibold">
                   ON
                 </span>
               )}
@@ -383,7 +391,7 @@ export const ReviewListPage: React.FC = () => {
           </div>
 
           {/* Results info */}
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-spotify-gray-400">
             {totalCount > 0 && (
               <span>
                 {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} / {totalCount}件
@@ -394,11 +402,11 @@ export const ReviewListPage: React.FC = () => {
 
         {/* Filter panel */}
         {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-6 pt-6 border-t border-spotify-gray-700">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Rent range */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-spotify-gray-300 mb-2">
                   {t('search.filterOptions.rentRange')}
                 </label>
                 <div className="flex space-x-2">
@@ -410,7 +418,7 @@ export const ReviewListPage: React.FC = () => {
                       ...prev,
                       minRent: e.target.value ? parseInt(e.target.value) : null
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="input-field w-full text-sm"
                   />
                   <input
                     type="number"
@@ -420,14 +428,14 @@ export const ReviewListPage: React.FC = () => {
                       ...prev,
                       maxRent: e.target.value ? parseInt(e.target.value) : null
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="input-field w-full text-sm"
                   />
                 </div>
               </div>
 
               {/* Layout */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-spotify-gray-300 mb-2">
                   {t('search.filterOptions.layout')}
                 </label>
                 <input
@@ -438,13 +446,13 @@ export const ReviewListPage: React.FC = () => {
                     ...prev,
                     layout: e.target.value
                   }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field w-full text-sm"
                 />
               </div>
 
               {/* Minimum rating */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-spotify-gray-300 mb-2">
                   {t('search.filterOptions.minRating')}
                 </label>
                 <select
@@ -453,7 +461,7 @@ export const ReviewListPage: React.FC = () => {
                     ...prev,
                     minRating: e.target.value ? parseInt(e.target.value) : null
                   }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field w-full text-sm"
                 >
                   <option value="">{t('search.filterOptions.noSpecification')}</option>
                   <option value="1">{t('search.filterOptions.ratingOptions.1')}</option>
@@ -466,7 +474,7 @@ export const ReviewListPage: React.FC = () => {
 
               {/* Has images */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-spotify-gray-300 mb-2">
                   {t('search.filterOptions.photos')}
                 </label>
                 <select
@@ -475,7 +483,7 @@ export const ReviewListPage: React.FC = () => {
                     ...prev,
                     hasImages: e.target.value === '' ? null : e.target.value === 'true'
                   }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field w-full text-sm"
                 >
                   <option value="">{t('search.filterOptions.noSpecification')}</option>
                   <option value="true">{t('search.filterOptions.withPhotos')}</option>
@@ -489,7 +497,7 @@ export const ReviewListPage: React.FC = () => {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={clearFilters}
-                  className="flex items-center space-x-2 px-3 py-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                  className="flex items-center space-x-2 px-3 py-1 text-sm text-spotify-gray-400 hover:text-white transition-colors"
                 >
                   <X className="h-4 w-4" />
                   <span>{t('search.clearFilters')}</span>
@@ -498,51 +506,66 @@ export const ReviewListPage: React.FC = () => {
             )}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Results */}
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="flex-center py-16">
+          <div className="text-center space-y-4">
+            <div className="spinner w-12 h-12 mx-auto"></div>
+            <p className="text-spotify-gray-400">{t('common.loading')}</p>
+          </div>
         </div>
       ) : reviews.length > 0 ? (
         <>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid-responsive">
             {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
+              <div key={review.id} className="animate-slide-up">
+                <ReviewCard review={review} />
+              </div>
             ))}
           </div>
           <Pagination />
         </>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {t('search.noResults')}
-          </h3>
-          <p className="text-gray-600 mb-4">
-            {t('search.noResultsMessage')}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => {
-                setSearchQuery('')
-                clearFilters()
-                setCurrentPage(1)
-                updateURL({ q: '', page: '1' })
-              }}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              {t('search.resetSearch')}
-            </button>
-            <Link
-              to="/post"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              {t('search.postReview')}
-            </Link>
+        <Card className="text-center py-16">
+          <div className="space-y-6">
+            <div className="w-20 h-20 bg-spotify-gray-700 rounded-full flex-center mx-auto">
+              <Search className="h-10 w-10 text-spotify-gray-500" />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold text-white">
+                {t('search.noResults')}
+              </h3>
+              <p className="text-spotify-gray-400 max-w-md mx-auto">
+                {t('search.noResultsMessage')}
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                onClick={() => {
+                  setSearchQuery('')
+                  clearFilters()
+                  setCurrentPage(1)
+                  updateURL({ q: '', page: '1' })
+                }}
+                variant="secondary"
+              >
+                {t('search.resetSearch')}
+              </Button>
+              <Button
+                as={Link}
+                to="/post"
+                variant="primary"
+                icon={Plus}
+              >
+                {t('search.postReview')}
+              </Button>
+            </div>
           </div>
-        </div>
+        </Card>
       )}
     </div>
   )
