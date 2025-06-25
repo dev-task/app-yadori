@@ -1,32 +1,22 @@
 {
   "name": "@yadori/logic",
   "version": "0.0.0",
-  "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "lint": "eslint src/",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
     "i18next": "^23.7.6",
-    "react-i18next": "^13.5.0"
+    "i18next-browser-languagedetector": "^7.2.0",
+    "react-i18next": "^13.5.0",
+    "mapbox-gl": "^3.13.0",
+    "@mapbox/mapbox-gl-geocoder": "^5.0.3"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "eslint": "^8.48.0",
-    "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    "typescript": "^5.5.3",
+    "eslint": "^9.9.1"
   }
 }
