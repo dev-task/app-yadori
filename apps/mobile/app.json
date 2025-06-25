@@ -16,14 +16,26 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yadori.mobile"
+      "bundleIdentifier": "com.yadori.mobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app uses location to help you select addresses for reviews.",
+        "NSCameraUsageDescription": "This app uses camera to take photos for reviews.",
+        "NSPhotoLibraryUsageDescription": "This app uses photo library to select images for reviews."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#121212"
       },
-      "package": "com.yadori.mobile"
+      "package": "com.yadori.mobile",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -31,7 +43,20 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Yadori to use your location to help select addresses for reviews."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them in reviews.",
+          "cameraPermission": "The app accesses your camera to let you take photos for reviews."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

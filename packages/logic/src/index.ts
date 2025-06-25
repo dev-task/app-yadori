@@ -7,3 +7,14 @@ export * from './utils/geocoding'
 export * from './i18n'
 export * from './hooks/useAuth'
 export * from './hooks/useI18n'
+
+// Export specific functions that are commonly used
+export { 
+  getReviews, 
+  getReview, 
+  createReview, 
+  updateReview,
+  getUserProfile,
+  updateUserProfile,
+  createUserProfile
+} from './api'
