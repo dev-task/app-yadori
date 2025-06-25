@@ -46,7 +46,19 @@
     "enterPassword": "Enter your password",
     "enterNickname": "Enter your nickname",
     "loginRequired": "Login required",
-    "termsAndPrivacy": "By continuing, you agree to our Terms of Service and Privacy Policy"
+    "termsAndPrivacy": "By continuing, you agree to our Terms of Service and Privacy Policy",
+    "emailSent": "Email Sent",
+    "emailSentDescription": "We've sent you a confirmation email",
+    "checkYourEmail": "Check Your Email",
+    "emailSentTo": "We've sent a confirmation email to:",
+    "clickLinkToVerify": "Click the link in the email to verify your account.",
+    "emailNotReceived": "Didn't receive the email?",
+    "checkSpamFolder": "Check your spam folder",
+    "waitFewMinutes": "Wait a few minutes",
+    "checkEmailAddress": "Check if your email address is correct",
+    "backToLogin": "Back to Login",
+    "tryDifferentEmail": "Try a different email",
+    "emailVerificationNote": "You cannot log in to your account until email verification is complete."
   },
   "home": {
     "title": "Share Your Housing Experience",

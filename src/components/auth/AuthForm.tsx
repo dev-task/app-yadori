@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Mail, Lock, User, Eye, EyeOff, Music } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, Music, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useI18n } from '../../contexts/I18nContext'
 
@@ -15,6 +15,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState('')
 
   const { signIn, signUp } = useAuth()
   const { t } = useI18n()
@@ -27,6 +29,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
     try {
       if (mode === 'signup') {
         await signUp(email, password, nickname)
+        // アカウント作成成功時にメール確認画面を表示
+        setRegisteredEmail(email)
+        setShowEmailConfirmation(true)
+        // フォームをリセット
+        setEmail('')
+        setPassword('')
+        setNickname('')
       } else {
         await signIn(email, password)
       }
@@ -35,6 +44,102 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleBackToLogin = () => {
+    setShowEmailConfirmation(false)
+    setRegisteredEmail('')
+    onToggleMode() // ログインモードに切り替え
+  }
+
+  // メール確認画面
+  if (showEmailConfirmation) {
+    return (
+      <div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          {/* ヘッダー */}
+          <div className="text-center">
+            <div className="mx-auto h-16 w-16 bg-spotify-green-500 rounded-full flex-center mb-6 shadow-glow">
+              <CheckCircle className="h-8 w-8 text-black" />
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-2">
+              {t('auth.emailSent')}
+            </h2>
+            <p className="text-spotify-gray-300">
+              {t('auth.emailSentDescription')}
+            </p>
+          </div>
+
+          {/* メール確認カード */}
+          <div className="card bg-spotify-gray-800 border border-spotify-gray-700">
+            <div className="space-y-6">
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 bg-spotify-blue-500 bg-opacity-20 rounded-full flex-center mx-auto">
+                  <Mail className="h-8 w-8 text-spotify-blue-400" />
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-white">
+                    {t('auth.checkYourEmail')}
+                  </h3>
+                  <p className="text-spotify-gray-300 text-sm leading-relaxed">
+                    {t('auth.emailSentTo')} <span className="font-medium text-spotify-green-400">{registeredEmail}</span>
+                  </p>
+                  <p className="text-spotify-gray-400 text-sm">
+                    {t('auth.clickLinkToVerify')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-spotify-blue-500 bg-opacity-10 border border-spotify-blue-500 border-opacity-30 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <Mail className="h-5 w-5 text-spotify-blue-400 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm">
+                    <p className="text-spotify-blue-300 font-medium mb-1">
+                      {t('auth.emailNotReceived')}
+                    </p>
+                    <ul className="text-spotify-blue-200 space-y-1 text-xs">
+                      <li>• {t('auth.checkSpamFolder')}</li>
+                      <li>• {t('auth.waitFewMinutes')}</li>
+                      <li>• {t('auth.checkEmailAddress')}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  onClick={handleBackToLogin}
+                  className="btn-primary w-full"
+                >
+                  {t('auth.backToLogin')}
+                </button>
+                
+                <div className="text-center">
+                  <button
+                    onClick={() => {
+                      setShowEmailConfirmation(false)
+                      setRegisteredEmail('')
+                      // サインアップモードに戻る
+                    }}
+                    className="text-spotify-gray-400 hover:text-white text-sm transition-colors duration-200"
+                  >
+                    {t('auth.tryDifferentEmail')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* フッター */}
+          <div className="text-center">
+            <p className="text-spotify-gray-500 text-xs">
+              {t('auth.emailVerificationNote')}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

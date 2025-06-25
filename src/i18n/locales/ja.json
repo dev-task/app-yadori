@@ -46,7 +46,19 @@
     "enterPassword": "パスワードを入力",
     "enterNickname": "ニックネームを入力",
     "loginRequired": "ログインが必要です",
-    "termsAndPrivacy": "続行することで、利用規約とプライバシーポリシーに同意したものとみなされます"
+    "termsAndPrivacy": "続行することで、利用規約とプライバシーポリシーに同意したものとみなされます",
+    "emailSent": "メールを送信しました",
+    "emailSentDescription": "アカウントの確認メールを送信しました",
+    "checkYourEmail": "メールをご確認ください",
+    "emailSentTo": "以下のメールアドレスに確認メールを送信しました：",
+    "clickLinkToVerify": "メール内のリンクをクリックしてアカウントを有効化してください。",
+    "emailNotReceived": "メールが届かない場合",
+    "checkSpamFolder": "迷惑メールフォルダをご確認ください",
+    "waitFewMinutes": "数分お待ちください",
+    "checkEmailAddress": "メールアドレスが正しいかご確認ください",
+    "backToLogin": "ログインページに戻る",
+    "tryDifferentEmail": "別のメールアドレスで試す",
+    "emailVerificationNote": "メールの確認が完了するまで、アカウントにログインできません。"
   },
   "home": {
     "title": "住まいの体験を共有しよう",
