@@ -7,6 +7,7 @@ export * from './utils/geocoding'
 export * from './i18n'
 export * from './hooks/useAuth'
 export * from './hooks/useI18n'
+export * from './hooks/useRealtime'
 
 // Export specific functions that are commonly used
 export { 

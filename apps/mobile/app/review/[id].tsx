@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { View, ScrollView, Image, TouchableOpacity, Alert } from 'react-native'
-import { Text, Card, Button } from '@yadori/ui'
+import { View, ScrollView, Image, TouchableOpacity, Alert, RefreshControl } from 'react-native'
+import { Text, Card, Button, Input } from '@yadori/ui'
 import { useLocalSearchParams, router } from 'expo-router'
 import { useAuth, useI18n, getReview, supabase } from '@yadori/logic'
-import { MapPin, Star, Heart, MessageCircle, User, Calendar, DollarSign, Home, ArrowLeft } from '@expo/vector-icons/Feather'
+import { MapPin, Star, Heart, MessageCircle, User, Calendar, DollarSign, Home, ArrowLeft, Send, Edit2, Trash2, MoreVertical } from '@expo/vector-icons/Feather'
 
 interface Review {
   id: number
@@ -30,6 +30,7 @@ interface Review {
   }[]
   comments: Array<{
     id: number
+    user_id: string
     body: string
     created_at: string
     users: {
@@ -44,15 +45,67 @@ export default function ReviewDetailScreen() {
   const { t } = useI18n()
   const [review, setReview] = useState<Review | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
   const [isLiked, setIsLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(0)
+  const [commentCount, setCommentCount] = useState(0)
+  const [newComment, setNewComment] = useState('')
+  const [postingComment, setPostingComment] = useState(false)
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
+  const [editCommentText, setEditCommentText] = useState('')
 
   useEffect(() => {
     if (id) {
       fetchReview()
+      setupRealtimeSubscriptions()
+    }
+
+    return () => {
+      // Cleanup subscriptions
+      supabase.removeAllChannels()
     }
   }, [id])
+
+  const setupRealtimeSubscriptions = () => {
+    if (!id) return
+
+    // Subscribe to likes changes
+    const likesChannel = supabase
+      .channel(`likes_${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'likes',
+          filter: `review_id=eq.${id}`
+        },
+        (payload) => {
+          console.log('Likes change:', payload)
+          fetchLikeStatus()
+        }
+      )
+      .subscribe()
+
+    // Subscribe to comments changes
+    const commentsChannel = supabase
+      .channel(`comments_${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'comments',
+          filter: `review_id=eq.${id}`
+        },
+        (payload) => {
+          console.log('Comments change:', payload)
+          fetchComments()
+        }
+      )
+      .subscribe()
+  }
 
   const fetchReview = async () => {
     if (!id) return
@@ -61,7 +114,21 @@ export default function ReviewDetailScreen() {
       setLoading(true)
       const data = await getReview(parseInt(id))
       setReview(data)
+      setCommentCount(data.comments?.length || 0)
 
+      await fetchLikeStatus()
+    } catch (error: any) {
+      console.error('Error fetching review:', error)
+      setError('レビューの取得に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchLikeStatus = async () => {
+    if (!id) return
+
+    try {
       // Check if user liked this review
       if (user) {
         const { data: userLike } = await supabase
@@ -81,12 +148,40 @@ export default function ReviewDetailScreen() {
         .eq('review_id', parseInt(id))
 
       setLikeCount(count || 0)
-    } catch (error: any) {
-      console.error('Error fetching review:', error)
-      setError('レビューの取得に失敗しました')
-    } finally {
-      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching like status:', error)
     }
+  }
+
+  const fetchComments = async () => {
+    if (!id || !review) return
+
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .select(`
+          *,
+          users!comments_user_id_fkey(nickname)
+        `)
+        .eq('review_id', parseInt(id))
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+
+      setReview(prev => prev ? {
+        ...prev,
+        comments: data || []
+      } : null)
+      setCommentCount(data?.length || 0)
+    } catch (error) {
+      console.error('Error fetching comments:', error)
+    }
+  }
+
+  const onRefresh = async () => {
+    setRefreshing(true)
+    await fetchReview()
+    setRefreshing(false)
   }
 
   const handleLike = async () => {
@@ -128,12 +223,111 @@ export default function ReviewDetailScreen() {
     }
   }
 
+  const handlePostComment = async () => {
+    if (!user || !review || !newComment.trim()) {
+      return
+    }
+
+    setPostingComment(true)
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .insert({
+          review_id: review.id,
+          user_id: user.id,
+          body: newComment.trim()
+        })
+
+      if (error) throw error
+
+      setNewComment('')
+      // Comments will be updated via realtime subscription
+    } catch (error: any) {
+      console.error('Comment post error:', error)
+      Alert.alert('エラー', 'コメントの投稿に失敗しました')
+    } finally {
+      setPostingComment(false)
+    }
+  }
+
+  const handleEditComment = async (commentId: number) => {
+    if (!editCommentText.trim()) return
+
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .update({ body: editCommentText.trim() })
+        .eq('id', commentId)
+
+      if (error) throw error
+
+      setEditingCommentId(null)
+      setEditCommentText('')
+      // Comments will be updated via realtime subscription
+    } catch (error: any) {
+      console.error('Comment edit error:', error)
+      Alert.alert('エラー', 'コメントの編集に失敗しました')
+    }
+  }
+
+  const handleDeleteComment = async (commentId: number) => {
+    Alert.alert(
+      'コメントを削除',
+      'このコメントを削除しますか？',
+      [
+        { text: 'キャンセル', style: 'cancel' },
+        {
+          text: '削除',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const { error } = await supabase
+                .from('comments')
+                .delete()
+                .eq('id', commentId)
+
+              if (error) throw error
+              // Comments will be updated via realtime subscription
+            } catch (error: any) {
+              console.error('Comment delete error:', error)
+              Alert.alert('エラー', 'コメントの削除に失敗しました')
+            }
+          }
+        }
+      ]
+    )
+  }
+
+  const startEditComment = (comment: any) => {
+    setEditingCommentId(comment.id)
+    setEditCommentText(comment.body)
+  }
+
+  const cancelEditComment = () => {
+    setEditingCommentId(null)
+    setEditCommentText('')
+  }
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+
+    if (diffInHours < 1) {
+      const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
+      return diffInMinutes < 1 ? 'たった今' : `${diffInMinutes}分前`
+    } else if (diffInHours < 24) {
+      return `${diffInHours}時間前`
+    } else if (diffInHours < 24 * 7) {
+      const diffInDays = Math.floor(diffInHours / 24)
+      return `${diffInDays}日前`
+    } else {
+      return date.toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    }
   }
 
   const formatRent = (rent: number | null) => {
@@ -233,7 +427,12 @@ export default function ReviewDetailScreen() {
   const averageRating = getAverageRating()
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#121212' }}>
+    <ScrollView 
+      style={{ flex: 1, backgroundColor: '#121212' }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={{ padding: 16, gap: 16 }}>
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
@@ -312,7 +511,7 @@ export default function ReviewDetailScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <MessageCircle size={16} color="#727272" />
               <Text color="secondary" style={{ marginLeft: 6 }}>
-                {review.comments.length} コメント
+                {commentCount} コメント
               </Text>
             </View>
           </View>
@@ -435,13 +634,55 @@ export default function ReviewDetailScreen() {
           </View>
         )}
 
-        {/* Comments */}
-        {review.comments && review.comments.length > 0 && (
-          <Card style={{ padding: 16 }}>
-            <Text variant="subheading" style={{ marginBottom: 16 }}>
-              コメント ({review.comments.length})
-            </Text>
-            
+        {/* Comments Section */}
+        <Card style={{ padding: 16 }}>
+          <Text variant="subheading" style={{ marginBottom: 16 }}>
+            コメント ({commentCount})
+          </Text>
+
+          {/* Comment Form */}
+          {user ? (
+            <View style={{ marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-end' }}>
+                <View style={{ flex: 1 }}>
+                  <Input
+                    placeholder="コメントを入力してください..."
+                    value={newComment}
+                    onChangeText={setNewComment}
+                    multiline
+                    numberOfLines={3}
+                    style={{ height: 80, textAlignVertical: 'top' }}
+                  />
+                </View>
+                <Button
+                  onPress={handlePostComment}
+                  disabled={!newComment.trim() || postingComment}
+                  style={{ paddingHorizontal: 12 }}
+                >
+                  {postingComment ? (
+                    <Text>投稿中...</Text>
+                  ) : (
+                    <Send size={16} color="#000" />
+                  )}
+                </Button>
+              </View>
+            </View>
+          ) : (
+            <View style={{ 
+              backgroundColor: '#181818', 
+              padding: 16, 
+              borderRadius: 8, 
+              marginBottom: 16,
+              alignItems: 'center'
+            }}>
+              <Text color="secondary">
+                コメントを投稿するにはログインが必要です
+              </Text>
+            </View>
+          )}
+
+          {/* Comments List */}
+          {review.comments && review.comments.length > 0 ? (
             <View style={{ gap: 12 }}>
               {review.comments.map((comment) => (
                 <View key={comment.id} style={{ 
@@ -461,21 +702,85 @@ export default function ReviewDetailScreen() {
                     }}>
                       <User size={12} color="#727272" />
                     </View>
-                    <Text style={{ fontWeight: '600', fontSize: 14 }}>
+                    <Text style={{ fontWeight: '600', fontSize: 14, flex: 1 }}>
                       {comment.users.nickname}
                     </Text>
-                    <Text color="secondary" style={{ fontSize: 12, marginLeft: 'auto' }}>
+                    <Text color="secondary" style={{ fontSize: 12 }}>
                       {formatDate(comment.created_at)}
                     </Text>
+                    {user && user.id === comment.user_id && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          Alert.alert(
+                            'コメント操作',
+                            'どの操作を行いますか？',
+                            [
+                              { text: 'キャンセル', style: 'cancel' },
+                              { text: '編集', onPress: () => startEditComment(comment) },
+                              { text: '削除', style: 'destructive', onPress: () => handleDeleteComment(comment.id) }
+                            ]
+                          )
+                        }}
+                        style={{ marginLeft: 8, padding: 4 }}
+                      >
+                        <MoreVertical size={14} color="#727272" />
+                      </TouchableOpacity>
+                    )}
                   </View>
-                  <Text style={{ lineHeight: 18 }}>
-                    {comment.body}
-                  </Text>
+                  
+                  {editingCommentId === comment.id ? (
+                    <View style={{ gap: 8 }}>
+                      <Input
+                        value={editCommentText}
+                        onChangeText={setEditCommentText}
+                        multiline
+                        numberOfLines={3}
+                        style={{ height: 60, textAlignVertical: 'top' }}
+                      />
+                      <View style={{ flexDirection: 'row', gap: 8 }}>
+                        <Button
+                          onPress={() => handleEditComment(comment.id)}
+                          disabled={!editCommentText.trim()}
+                          size="sm"
+                          style={{ flex: 1 }}
+                        >
+                          <Text>保存</Text>
+                        </Button>
+                        <Button
+                          onPress={cancelEditComment}
+                          variant="secondary"
+                          size="sm"
+                          style={{ flex: 1 }}
+                        >
+                          <Text>キャンセル</Text>
+                        </Button>
+                      </View>
+                    </View>
+                  ) : (
+                    <Text style={{ lineHeight: 18 }}>
+                      {comment.body}
+                    </Text>
+                  )}
                 </View>
               ))}
             </View>
-          </Card>
-        )}
+          ) : (
+            <View style={{ 
+              backgroundColor: '#181818', 
+              padding: 24, 
+              borderRadius: 8,
+              alignItems: 'center'
+            }}>
+              <MessageCircle size={32} color="#404040" style={{ marginBottom: 8 }} />
+              <Text color="secondary" style={{ textAlign: 'center' }}>
+                まだコメントがありません
+              </Text>
+              <Text color="secondary" style={{ textAlign: 'center', fontSize: 12, marginTop: 4 }}>
+                最初のコメントを投稿してみませんか？
+              </Text>
+            </View>
+          )}
+        </Card>
       </View>
     </ScrollView>
   )
