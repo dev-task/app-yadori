@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { PlusCircle, Search, TrendingUp, Play, ArrowRight, Sparkles, Users, Star } from 'lucide-react'
+import { PlusCircle, Search, TrendingUp, Play, ArrowRight, Sparkles, Users, Star, X } from 'lucide-react'
 import { Toast } from '../components/ui/Toast'
 import { ReviewCard } from '../components/ReviewCard'
 import { Card, Button, Badge } from '../components/ui'
@@ -28,11 +28,20 @@ export const HomePage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('')
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
+  const [showFeatures, setShowFeatures] = useState(true)
   const [stats, setStats] = useState({
     totalReviews: 0,
     totalUsers: 0,
     averageRating: 0
   })
+
+  // ローカルストレージから機能紹介セクションの表示状態を読み込み
+  useEffect(() => {
+    const savedShowFeatures = localStorage.getItem('showFeatures')
+    if (savedShowFeatures !== null) {
+      setShowFeatures(JSON.parse(savedShowFeatures))
+    }
+  }, [])
 
   useEffect(() => {
     // Check if there's a success message from navigation state
@@ -143,6 +152,11 @@ export const HomePage: React.FC = () => {
     }
   }
 
+  const handleDismissFeatures = () => {
+    setShowFeatures(false)
+    localStorage.setItem('showFeatures', 'false')
+  }
+
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Toast notification */}
@@ -225,50 +239,63 @@ export const HomePage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Features Section */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card interactive className="group">
-          <div className="space-y-4">
-            <div className="w-12 h-12 bg-spotify-green-500 bg-opacity-20 rounded-2xl flex-center group-hover:scale-110 transition-transform duration-200">
-              <PlusCircle className="h-6 w-6 text-spotify-green-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-white group-hover:text-spotify-green-300 transition-colors duration-200">
-              {t('home.features.realExperience.title')}
-            </h3>
-            <p className="text-spotify-gray-300 leading-relaxed">
-              {t('home.features.realExperience.description')}
-            </p>
-          </div>
-        </Card>
+      {/* Features Section - 非表示可能 */}
+      {showFeatures && (
+        <div className="relative">
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card interactive className="group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-spotify-green-500 bg-opacity-20 rounded-2xl flex-center group-hover:scale-110 transition-transform duration-200">
+                  <PlusCircle className="h-6 w-6 text-spotify-green-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white group-hover:text-spotify-green-300 transition-colors duration-200">
+                  {t('home.features.realExperience.title')}
+                </h3>
+                <p className="text-spotify-gray-300 leading-relaxed">
+                  {t('home.features.realExperience.description')}
+                </p>
+              </div>
+            </Card>
 
-        <Card interactive className="group">
-          <div className="space-y-4">
-            <div className="w-12 h-12 bg-spotify-blue-500 bg-opacity-20 rounded-2xl flex-center group-hover:scale-110 transition-transform duration-200">
-              <Search className="h-6 w-6 text-spotify-blue-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-white group-hover:text-spotify-blue-300 transition-colors duration-200">
-              {t('home.features.easySearch.title')}
-            </h3>
-            <p className="text-spotify-gray-300 leading-relaxed">
-              {t('home.features.easySearch.description')}
-            </p>
-          </div>
-        </Card>
+            <Card interactive className="group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-spotify-blue-500 bg-opacity-20 rounded-2xl flex-center group-hover:scale-110 transition-transform duration-200">
+                  <Search className="h-6 w-6 text-spotify-blue-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white group-hover:text-spotify-blue-300 transition-colors duration-200">
+                  {t('home.features.easySearch.title')}
+                </h3>
+                <p className="text-spotify-gray-300 leading-relaxed">
+                  {t('home.features.easySearch.description')}
+                </p>
+              </div>
+            </Card>
 
-        <Card interactive className="group">
-          <div className="space-y-4">
-            <div className="w-12 h-12 bg-spotify-purple-500 bg-opacity-20 rounded-2xl flex-center group-hover:scale-110 transition-transform duration-200">
-              <TrendingUp className="h-6 w-6 text-spotify-purple-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-white group-hover:text-spotify-purple-300 transition-colors duration-200">
-              {t('home.features.trustableInfo.title')}
-            </h3>
-            <p className="text-spotify-gray-300 leading-relaxed">
-              {t('home.features.trustableInfo.description')}
-            </p>
+            <Card interactive className="group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-spotify-purple-500 bg-opacity-20 rounded-2xl flex-center group-hover:scale-110 transition-transform duration-200">
+                  <TrendingUp className="h-6 w-6 text-spotify-purple-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white group-hover:text-spotify-purple-300 transition-colors duration-200">
+                  {t('home.features.trustableInfo.title')}
+                </h3>
+                <p className="text-spotify-gray-300 leading-relaxed">
+                  {t('home.features.trustableInfo.description')}
+                </p>
+              </div>
+            </Card>
           </div>
-        </Card>
-      </div>
+
+          {/* 非表示ボタン */}
+          <button
+            onClick={handleDismissFeatures}
+            className="absolute -top-2 -right-2 w-8 h-8 bg-spotify-gray-700 hover:bg-spotify-gray-600 text-spotify-gray-400 hover:text-white rounded-full flex-center transition-all duration-200 shadow-lg hover:shadow-xl"
+            title="この機能紹介を非表示にする"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Recent Reviews Section */}
       <div className="space-y-6">
