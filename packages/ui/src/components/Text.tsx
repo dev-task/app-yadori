@@ -32,6 +32,9 @@ export const Text = styled(TamaguiText, {
       accent: {
         color: '$green',
       },
+      error: {
+        color: '$red',
+      },
     },
   } as const,
   defaultVariants: {

@@ -1,0 +1,90 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "viewAll": "View All",
+    "noData": "No data available",
+    "required": "Required",
+    "optional": "Optional",
+    "new": "New"
+  },
+  "navigation": {
+    "home": "Home",
+    "search": "Search",
+    "post": "Post",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "signout": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "nickname": "Nickname",
+    "welcomeBack": "Welcome Back",
+    "createAccount": "Create Account",
+    "loginToApp": "Sign in to Yadori",
+    "shareExperience": "Share your housing experience",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "processing": "Processing...",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "enterNickname": "Enter your nickname",
+    "loginRequired": "Login required",
+    "termsAndPrivacy": "By continuing, you agree to our Terms of Service and Privacy Policy"
+  },
+  "home": {
+    "title": "Share Your Housing Experience",
+    "subtitle": "A platform to share and discover real housing information based on actual living experiences. Your experience helps someone find their new home.",
+    "postReview": "Post a Review",
+    "searchReviews": "Search Reviews",
+    "latestReviews": "Latest Reviews",
+    "getStarted": "Get Started"
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "saveProfile": "Save Profile",
+    "saving": "Saving...",
+    "profileUpdated": "Profile updated",
+    "profileUpdateError": "Failed to update profile",
+    "joinedDate": "Joined",
+    "noIntroduction": "No introduction set yet",
+    "enterNickname": "Enter your nickname",
+    "enterIntroduction": "Enter your introduction..."
+  },
+  "errors": {
+    "general": "An error occurred",
+    "networkError": "Network error occurred",
+    "unauthorized": "Authentication required",
+    "forbidden": "Access denied",
+    "notFound": "Page not found",
+    "serverError": "Server error occurred",
+    "validationError": "Input validation error",
+    "uploadError": "File upload failed",
+    "deleteError": "Delete failed",
+    "updateError": "Update failed"
+  },
+  "success": {
+    "reviewPosted": "Review posted successfully!",
+    "reviewUpdated": "Review updated successfully!",
+    "profileUpdated": "Profile updated",
+    "commentPosted": "Comment posted",
+    "commentUpdated": "Comment updated",
+    "commentDeleted": "Comment deleted"
+  }
+}
