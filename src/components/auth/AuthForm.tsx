@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Mail, Lock, User, Eye, EyeOff, Music, CheckCircle } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, Building2, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useI18n } from '../../contexts/I18nContext'
 
@@ -148,7 +148,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
         {/* ヘッダー */}
         <div className="text-center">
           <div className="mx-auto h-16 w-16 bg-spotify-green-500 rounded-full flex-center mb-6 shadow-glow">
-            <Music className="h-8 w-8 text-black" />
+            <Building2 className="h-8 w-8 text-black" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">
             {mode === 'signup' ? t('auth.createAccount') : t('auth.welcomeBack')}

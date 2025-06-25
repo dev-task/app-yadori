@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Search, PlusCircle, User, LogOut, Music, Settings } from 'lucide-react'
+import { Home, Search, PlusCircle, User, LogOut, Building2, Settings } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../contexts/I18nContext'
 import { LanguageSwitcher } from './LanguageSwitcher'
@@ -40,7 +40,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center flex-shrink-0 px-6 py-6">
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="w-10 h-10 bg-spotify-green-500 rounded-full flex-center group-hover:scale-110 transition-transform duration-200">
-                <Music className="h-6 w-6 text-black" />
+                <Building2 className="h-6 w-6 text-black" />
               </div>
               <span className="text-xl font-bold text-white group-hover:text-spotify-green-400 transition-colors duration-200">
                 Yadori
@@ -96,7 +96,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-spotify-green-500 rounded-full flex-center">
-                  <Music className="h-5 w-5 text-black" />
+                  <Building2 className="h-5 w-5 text-black" />
                 </div>
                 <span className="text-lg font-bold text-white">Yadori</span>
               </Link>
