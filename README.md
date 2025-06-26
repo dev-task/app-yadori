@@ -24,17 +24,17 @@ Yadoriは、実際に住んだ経験をもとに、リアルな住まい情報�
 ### 🛠️ 技術スタック
 
 - **フロントエンド**: 
-  - React 18
-  - TypeScript
-  - Tailwind CSS
-  - Vite (ビルドツール)
-  - React Router DOM (ルーティング)
-  - React i18next (国際化)
-  - Lucide React (アイコン)
-  - Mapbox GL JS (地図機能)
+  - React 18.3.1
+  - TypeScript 5.5.3
+  - Tailwind CSS 3.4.1
+  - Vite 5.4.2 (ビルドツール)
+  - React Router DOM 6.20.1 (ルーティング)
+  - React i18next 13.5.0 (国際化)
+  - Lucide React 0.344.0 (アイコン)
+  - Mapbox GL JS 3.13.0 (地図機能)
 
 - **バックエンド**: 
-  - Supabase (BaaS)
+  - Supabase 2.39.0 (BaaS)
     - PostgreSQL (データベース)
     - Supabase Auth (認証)
     - Supabase Storage (ストレージ)
@@ -68,6 +68,25 @@ Supabaseプロジェクトを設定するには：
 2. 新しいプロジェクトを作成
 3. `supabase/migrations`ディレクトリ内のSQLスクリプトを実行してデータベーススキーマを設定
 4. プロジェクトURLと匿名キーを`.env`ファイルに設定
+
+### 🗺️ 地図機能の詳細
+
+Yadoriでは、Mapbox GL JSを使用して以下の地図機能を提供しています：
+
+1. **地図からの住所選択**
+   - 投稿フォームで「地図で選択」ボタンをクリックすると地図モーダルが表示されます
+   - 住所検索バーで場所を検索するか、地図上で直接ピンをドラッグして位置を選択できます
+   - 選択した位置の住所は自動的にフォームに入力されます
+
+2. **位置情報の表示**
+   - レビュー詳細ページでは、投稿された住所の位置が地図上に表示されます
+   - プライバシーに配慮し、正確な住所ではなく最寄り駅からの距離表記を推奨しています
+
+3. **地図コンポーネント構成**
+   - MapModal: 地図選択モーダル
+   - MapboxMap: Mapbox地図コンポーネント
+   - AddressSearchBar: 住所検索バー
+   - LocationPicker: 位置選択ピン
 
 ### 🚀 セットアップ方法
 
@@ -126,8 +145,34 @@ yarn build
 
 ### 📊 データベース構造
 
+Yadoriは以下のテーブル構造を使用しています：
+
 - **users**: ユーザープロフィール情報
-- **reviews**: レビュー投稿データ（位置情報含む）
+  - id (uuid): プライマリキー
+  - nickname (string): ニックネーム
+  - email (string): メールアドレス
+  - bio (string): 自己紹介
+  - created_at (timestamp): 作成日時
+  - updated_at (timestamp): 更新日時
+
+- **reviews**: レビュー投稿データ
+  - id (int): プライマリキー
+  - user_id (uuid): 投稿者ID (外部キー)
+  - address_text (string): 住所テキスト
+  - latitude (float): 緯度
+  - longitude (float): 経度
+  - rent (int): 家賃
+  - layout (string): 間取り
+  - period_lived (string): 居住期間
+  - pros_text (string): 良かった点
+  - cons_text (string): 悪かった点
+  - rating_location (int): 立地評価
+  - rating_sunlight (int): 日当たり評価
+  - rating_soundproof (int): 防音評価
+  - rating_environment (int): 環境評価
+  - created_at (timestamp): 作成日時
+  - updated_at (timestamp): 更新日時
+
 - **review_images**: レビュー画像
 - **comments**: コメントデータ
 - **likes**: いいね情報
@@ -195,6 +240,18 @@ function MyComponent() {
 }
 ```
 
+### 🔒 セキュリティ考慮事項
+
+#### APIキー管理
+- Mapbox APIキーは環境変数で管理しています
+- フロントエンド用の制限付きAPIキーを使用しています
+- 本番環境では適切なリファラー制限を設定することを推奨します
+
+#### 位置情報プライバシー
+- 正確な住所ではなく、最寄り駅からの距離表記を推奨しています
+- ユーザーが詳細な住所を入力した場合の注意喚起を行っています
+- 位置情報の精度調整オプションを提供しています
+
 ### 🌐 デプロイ
 
 フロントエンドは Netlify などの静的サイトホスティングサービスにデプロイすることができます。
@@ -237,17 +294,17 @@ Yadori is a platform where users can share and discover real housing information
 ### 🛠️ Technology Stack
 
 - **Frontend**: 
-  - React 18
-  - TypeScript
-  - Tailwind CSS
-  - Vite (build tool)
-  - React Router DOM (routing)
-  - React i18next (internationalization)
-  - Lucide React (icons)
-  - Mapbox GL JS (map functionality)
+  - React 18.3.1
+  - TypeScript 5.5.3
+  - Tailwind CSS 3.4.1
+  - Vite 5.4.2 (build tool)
+  - React Router DOM 6.20.1 (routing)
+  - React i18next 13.5.0 (internationalization)
+  - Lucide React 0.344.0 (icons)
+  - Mapbox GL JS 3.13.0 (map functionality)
 
 - **Backend**: 
-  - Supabase (BaaS)
+  - Supabase 2.39.0 (BaaS)
     - PostgreSQL (database)
     - Supabase Auth (authentication)
     - Supabase Storage (storage)
@@ -281,6 +338,25 @@ To set up a Supabase project:
 2. Create a new project
 3. Run the SQL scripts in the `supabase/migrations` directory to set up the database schema
 4. Set the project URL and anonymous key in your `.env` file
+
+### 🗺️ Map Functionality Details
+
+Yadori uses Mapbox GL JS to provide the following map features:
+
+1. **Map-based Address Selection**
+   - Click the "Select on Map" button in the post form to display the map modal
+   - Search for a location using the address search bar or drag the pin directly on the map
+   - The address of the selected location is automatically entered into the form
+
+2. **Location Display**
+   - The review detail page displays the location of the posted address on a map
+   - For privacy considerations, we recommend indicating the distance from the nearest station rather than the exact address
+
+3. **Map Component Structure**
+   - MapModal: Map selection modal
+   - MapboxMap: Mapbox map component
+   - AddressSearchBar: Address search bar
+   - LocationPicker: Location selection pin
 
 ### 🚀 Setup Instructions
 
@@ -339,8 +415,34 @@ The built files will be generated in the `dist` directory.
 
 ### 📊 Database Structure
 
+Yadori uses the following table structure:
+
 - **users**: User profile information
-- **reviews**: Review post data (including location information)
+  - id (uuid): Primary key
+  - nickname (string): User nickname
+  - email (string): Email address
+  - bio (string): User bio
+  - created_at (timestamp): Creation timestamp
+  - updated_at (timestamp): Update timestamp
+
+- **reviews**: Review post data
+  - id (int): Primary key
+  - user_id (uuid): Poster ID (foreign key)
+  - address_text (string): Address text
+  - latitude (float): Latitude
+  - longitude (float): Longitude
+  - rent (int): Rent amount
+  - layout (string): Room layout
+  - period_lived (string): Period lived
+  - pros_text (string): Positive points
+  - cons_text (string): Negative points
+  - rating_location (int): Location rating
+  - rating_sunlight (int): Sunlight rating
+  - rating_soundproof (int): Soundproofing rating
+  - rating_environment (int): Environment rating
+  - created_at (timestamp): Creation timestamp
+  - updated_at (timestamp): Update timestamp
+
 - **review_images**: Review images
 - **comments**: Comment data
 - **likes**: Like information
@@ -407,6 +509,18 @@ function MyComponent() {
   );
 }
 ```
+
+### 🔒 Security Considerations
+
+#### API Key Management
+- Mapbox API keys are managed using environment variables
+- We use restricted API keys for frontend use
+- We recommend setting appropriate referrer restrictions in production environments
+
+#### Location Privacy
+- We recommend indicating the distance from the nearest station rather than the exact address
+- We provide warnings when users enter detailed address information
+- We offer location precision adjustment options
 
 ### 🌐 Deployment
 
