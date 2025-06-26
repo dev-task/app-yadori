@@ -48,9 +48,9 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
 
   return (
     <Link to={`/review/${review.id}`} className="block group">
-      <div className="card-interactive bg-spotify-gray-800 rounded-2xl overflow-hidden shadow-spotify-lg hover:shadow-spotify-xl transition-all duration-300 hover:bg-spotify-gray-700 border border-spotify-gray-700 hover:border-spotify-gray-600">
+      <div className="card-interactive bg-spotify-gray-800 rounded-2xl overflow-hidden shadow-spotify-lg hover:shadow-spotify-xl transition-all duration-300 hover:bg-spotify-gray-700 border border-spotify-gray-700 hover:border-spotify-gray-600 h-full flex flex-col">
         {/* 画像セクション */}
-        <div className="relative aspect-video bg-gradient-to-br from-spotify-gray-700 to-spotify-gray-800 overflow-hidden">
+        <div className="relative aspect-video bg-gradient-to-br from-spotify-gray-700 to-spotify-gray-800 overflow-hidden flex-shrink-0">
           {review.review_images && review.review_images.length > 0 ? (
             <>
               <img
@@ -88,11 +88,11 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
         </div>
 
         {/* コンテンツセクション */}
-        <div className="p-6 space-y-4">
+        <div className="p-4 space-y-3 flex-1 flex flex-col">
           {/* ヘッダー */}
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-spotify-green-500 rounded-full flex-center">
+              <div className="w-8 h-8 bg-spotify-green-500 rounded-full flex-center flex-shrink-0">
                 <User className="h-4 w-4 text-black" />
               </div>
               <div className="flex-1 min-w-0">
@@ -107,8 +107,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
             
             <div className="space-y-2">
               <div className="flex items-start space-x-2">
-                <MapPin className="h-5 w-5 text-spotify-green-400 mt-0.5 flex-shrink-0" />
-                <h3 className="text-white font-semibold text-lg leading-tight group-hover:text-spotify-green-300 transition-colors duration-200 line-clamp-2">
+                <MapPin className="h-4 w-4 text-spotify-green-400 mt-1 flex-shrink-0" />
+                <h3 className="text-white font-semibold text-base leading-tight group-hover:text-spotify-green-300 transition-colors duration-200 line-clamp-2 flex-1">
                   {review.address_text}
                 </h3>
               </div>
@@ -116,30 +116,30 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
           </div>
 
           {/* 基本情報 */}
-          <div className="flex flex-wrap items-center gap-3 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
             {formatRent(review.rent) && (
-              <div className="flex items-center space-x-1 text-spotify-gray-300">
-                <DollarSign className="h-4 w-4 text-spotify-green-400" />
+              <div className="flex items-center space-x-1 text-spotify-gray-300 bg-spotify-gray-700 px-2 py-1 rounded-md">
+                <DollarSign className="h-3 w-3 text-spotify-green-400" />
                 <span className="font-medium">{formatRent(review.rent)}</span>
               </div>
             )}
             {review.layout && (
-              <div className="flex items-center space-x-1 text-spotify-gray-300">
-                <Home className="h-4 w-4 text-spotify-blue-400" />
+              <div className="flex items-center space-x-1 text-spotify-gray-300 bg-spotify-gray-700 px-2 py-1 rounded-md">
+                <Home className="h-3 w-3 text-spotify-blue-400" />
                 <span className="font-medium">{review.layout}</span>
               </div>
             )}
             {review.period_lived && (
-              <div className="flex items-center space-x-1 text-spotify-gray-300">
-                <Calendar className="h-4 w-4 text-spotify-purple-400" />
-                <span className="font-medium truncate">{review.period_lived}</span>
+              <div className="flex items-center space-x-1 text-spotify-gray-300 bg-spotify-gray-700 px-2 py-1 rounded-md">
+                <Calendar className="h-3 w-3 text-spotify-purple-400" />
+                <span className="font-medium truncate max-w-[80px]">{review.period_lived}</span>
               </div>
             )}
           </div>
 
           {/* プレビューテキスト */}
           {(review.pros_text || review.cons_text) && (
-            <div className="space-y-2">
+            <div className="flex-1">
               <p className="text-spotify-gray-300 text-sm leading-relaxed line-clamp-2">
                 {review.pros_text && review.pros_text.length > 0 
                   ? review.pros_text 
@@ -149,22 +149,20 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
           )}
 
           {/* アクション */}
-          <div className="flex items-center justify-between pt-4 border-t border-spotify-gray-700">
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-2 text-spotify-gray-400 hover:text-red-400 transition-colors duration-200">
+          <div className="flex items-center justify-between pt-2 border-t border-spotify-gray-700 mt-auto">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1 text-spotify-gray-400 hover:text-red-400 transition-colors duration-200">
                 <Heart className="h-4 w-4" />
                 <span className="text-sm font-medium">{review._count?.likes || 0}</span>
               </div>
-              <div className="flex items-center space-x-2 text-spotify-gray-400 hover:text-spotify-blue-400 transition-colors duration-200">
+              <div className="flex items-center space-x-1 text-spotify-gray-400 hover:text-spotify-blue-400 transition-colors duration-200">
                 <MessageCircle className="h-4 w-4" />
                 <span className="text-sm font-medium">{review._count?.comments || 0}</span>
               </div>
             </div>
             
-            {/* 詳細ボタン - レスポンシブ対応 */}
-            <div className="flex items-center space-x-2 text-spotify-green-400 group-hover:text-spotify-green-300 transition-colors duration-200">
-              <span className="text-sm font-semibold hidden sm:inline">詳細を見る</span>
-              <span className="text-sm font-semibold sm:hidden">詳細</span>
+            <div className="flex items-center space-x-1 text-spotify-green-400 group-hover:text-spotify-green-300 transition-colors duration-200">
+              <span className="text-sm font-semibold whitespace-nowrap">詳細</span>
               <Play className="h-4 w-4 transform rotate-0 group-hover:translate-x-1 transition-transform duration-200" />
             </div>
           </div>
