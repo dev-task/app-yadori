@@ -1,21 +1,53 @@
 {
-  "name": "yadori-monorepo",
+  "name": "yadori-web-app",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "packageManager": "npm@10.2.4",
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "type-check": "turbo type-check",
-    "clean": "turbo clean"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "test:integration": "node scripts/integration-test.js",
+    "test:performance": "node scripts/performance-test.js",
+    "test:all": "npm run test:integration && npm run test:performance"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3",
+    "@tamagui/animations-react-native": "^1.87.0",
+    "@tamagui/config": "^1.87.0",
+    "@tamagui/core": "^1.87.0",
+    "@tamagui/font-inter": "^1.87.0",
+    "@tamagui/theme-base": "^1.87.0",
+    "@tamagui/toast": "^1.87.0",
+    "i18next": "^23.7.16",
+    "lucide-react": "^0.263.1",
+    "mapbox-gl": "^3.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^13.5.0",
+    "react-router-dom": "^6.20.1"
   },
   "devDependencies": {
-    "@turbo/gen": "^1.12.4",
-    "turbo": "^1.12.4",
-    "typescript": "^5.5.3"
+    "@types/mapbox-gl": "^3.1.0",
+    "@types/node": "^20.10.4",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
