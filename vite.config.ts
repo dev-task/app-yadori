@@ -7,4 +7,14 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  // Explicitly specify the TypeScript config file
+  esbuild: {
+    tsconfig: './tsconfig.app.json'
+  },
+  // Ensure proper path resolution
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
+  }
 });
