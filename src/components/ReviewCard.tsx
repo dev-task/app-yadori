@@ -108,7 +108,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
             <div className="space-y-2">
               <div className="flex items-start space-x-2">
                 <MapPin className="h-5 w-5 text-spotify-green-400 mt-0.5 flex-shrink-0" />
-                <h3 className="text-white font-semibold text-lg leading-tight group-hover:text-spotify-green-300 transition-colors duration-200 truncate-2">
+                <h3 className="text-white font-semibold text-lg leading-tight group-hover:text-spotify-green-300 transition-colors duration-200 line-clamp-2">
                   {review.address_text}
                 </h3>
               </div>
@@ -116,7 +116,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
           </div>
 
           {/* 基本情報 */}
-          <div className="flex items-center space-x-4 text-sm">
+          <div className="flex flex-wrap items-center gap-3 text-sm">
             {formatRent(review.rent) && (
               <div className="flex items-center space-x-1 text-spotify-gray-300">
                 <DollarSign className="h-4 w-4 text-spotify-green-400" />
@@ -140,7 +140,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
           {/* プレビューテキスト */}
           {(review.pros_text || review.cons_text) && (
             <div className="space-y-2">
-              <p className="text-spotify-gray-300 text-sm leading-relaxed truncate-2">
+              <p className="text-spotify-gray-300 text-sm leading-relaxed line-clamp-2">
                 {review.pros_text && review.pros_text.length > 0 
                   ? review.pros_text 
                   : review.cons_text}
@@ -161,8 +161,10 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
               </div>
             </div>
             
+            {/* 詳細ボタン - レスポンシブ対応 */}
             <div className="flex items-center space-x-2 text-spotify-green-400 group-hover:text-spotify-green-300 transition-colors duration-200">
-              <span className="text-sm font-semibold">詳細を見る</span>
+              <span className="text-sm font-semibold hidden sm:inline">詳細を見る</span>
+              <span className="text-sm font-semibold sm:hidden">詳細</span>
               <Play className="h-4 w-4 transform rotate-0 group-hover:translate-x-1 transition-transform duration-200" />
             </div>
           </div>
