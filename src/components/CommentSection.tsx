@@ -40,24 +40,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     onCommentCountChange?.(comments.length)
   }, [comments.length, onCommentCountChange])
 
-  const fetchComments = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('comments')
-        .select(`
-          *,
-          users!inner(nickname)
-        `)
-        .eq('review_id', reviewId)
-        .order('created_at', { ascending: true })
-
-      if (error) throw error
-      setComments(data || [])
-    } catch (error) {
-      console.error('Error fetching comments:', error)
-    }
-  }
-
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user || !newComment.trim()) return

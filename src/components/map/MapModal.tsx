@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { X, MapPin, Search, Navigation, Check, AlertCircle, Zap, Info } from 'lucide-react'
+import { X, MapPin, Navigation, Check, AlertCircle, Zap, Info } from 'lucide-react'
 import { useI18n } from '../../contexts/I18nContext'
 import { MapboxMap } from './MapboxMap'
 import { AddressSearchBar } from './AddressSearchBar'

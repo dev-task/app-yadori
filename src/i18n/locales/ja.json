@@ -275,7 +275,14 @@
     "pleaseSelectLocation": "場所を選択してください",
     "geolocationError": "位置情報の取得に失敗しました",
     "geolocationNotSupported": "このブラウザは位置情報をサポートしていません",
-    "selectFromMap": "地図で選択"
+    "selectFromMap": "地図で選択",
+    "loadingMap": "地図を読み込み中...",
+    "mapboxTokenMissing": "Mapbox APIキーが設定されていません",
+    "mapInitFailed": "地図の初期化に失敗しました",
+    "fetchingAddress": "住所を取得中...",
+    "clickOrDragInstruction": "地図をクリックまたはピンをドラッグして位置を選択",
+    "zoom": "ズーム",
+    "setMapboxTokenEnv": "環境変数 VITE_MAPBOX_ACCESS_TOKEN を設定してください。"
   },
   "errors": {
     "general": "エラーが発生しました",

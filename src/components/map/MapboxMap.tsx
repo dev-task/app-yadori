@@ -43,7 +43,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
 
     // Check if Mapbox token is available
     if (!mapboxgl.accessToken) {
-      setMapError('Mapbox APIキーが設定されていません')
+      setMapError(t('map.mapboxTokenMissing'))
       return
     }
 
@@ -169,12 +169,12 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
 
       map.current.on('error', (e) => {
         console.error('Map error:', e)
-        setMapError('地図の読み込みに失敗しました')
+        setMapError(t('map.mapInitFailed'))
       })
 
     } catch (error) {
       console.error('Error initializing map:', error)
-      setMapError('地図の初期化に失敗しました')
+      setMapError(t('map.mapInitFailed'))
     }
 
     return () => {
@@ -183,7 +183,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
         map.current = null
       }
     }
-  }, [])
+  }, [t])
 
   // Update marker position when selectedLocation changes
   useEffect(() => {
@@ -268,7 +268,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
         <div className="absolute inset-0 bg-spotify-gray-800 rounded-xl flex-center">
           <div className="text-center space-y-4">
             <div className="spinner w-8 h-8 mx-auto"></div>
-            <p className="text-spotify-gray-400 text-sm">地図を読み込み中...</p>
+            <p className="text-spotify-gray-400 text-sm">{t('map.loadingMap')}</p>
           </div>
         </div>
       )}
@@ -281,13 +281,13 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
               <span className="text-red-400 text-2xl">!</span>
             </div>
             <div>
-              <h3 className="text-white font-semibold mb-2">地図を表示できません</h3>
+              <h3 className="text-white font-semibold mb-2">{t('map.mapInitFailed')}</h3>
               <p className="text-spotify-gray-400 text-sm">
                 {mapError}
                 {!mapboxgl.accessToken && (
                   <>
                     <br />
-                    環境変数 VITE_MAPBOX_ACCESS_TOKEN を設定してください。
+                    {t('map.setMapboxTokenEnv')}
                   </>
                 )}
               </p>
@@ -300,7 +300,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
       {isReverseGeocoding && isMapLoaded && (
         <div className="absolute top-4 left-4 bg-spotify-gray-800 bg-opacity-90 backdrop-blur-sm rounded-lg px-3 py-2 border border-spotify-gray-600 flex items-center space-x-2">
           <div className="spinner w-4 h-4"></div>
-          <span className="text-spotify-gray-300 text-xs">住所を取得中...</span>
+          <span className="text-spotify-gray-300 text-xs">{t('map.fetchingAddress')}</span>
         </div>
       )}
 
@@ -308,7 +308,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
       {isMapLoaded && !mapError && !isReverseGeocoding && (
         <div className="absolute bottom-4 left-4 bg-spotify-gray-800 bg-opacity-90 backdrop-blur-sm rounded-lg px-3 py-2 border border-spotify-gray-600">
           <p className="text-spotify-gray-300 text-xs">
-            地図をクリックまたはピンをドラッグして位置を選択
+            {t('map.clickOrDragInstruction')}
           </p>
         </div>
       )}
@@ -317,7 +317,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
       {isMapLoaded && map.current && (
         <div className="absolute top-4 right-4 bg-spotify-gray-800 bg-opacity-90 backdrop-blur-sm rounded-lg px-2 py-1 border border-spotify-gray-600">
           <span className="text-spotify-gray-400 text-xs">
-            ズーム: {Math.round(map.current.getZoom())}
+            {t('map.zoom')}: {Math.round(map.current.getZoom())}
           </span>
         </div>
       )}

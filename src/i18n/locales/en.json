@@ -275,7 +275,14 @@
     "pleaseSelectLocation": "Please select a location",
     "geolocationError": "Failed to get location information",
     "geolocationNotSupported": "This browser does not support geolocation",
-    "selectFromMap": "Select from Map"
+    "selectFromMap": "Select from Map",
+    "loadingMap": "Loading map...",
+    "mapboxTokenMissing": "Mapbox API key is not configured",
+    "mapInitFailed": "Failed to initialize map",
+    "fetchingAddress": "Fetching address...",
+    "clickOrDragInstruction": "Click on the map or drag the pin to select location",
+    "zoom": "Zoom",
+    "setMapboxTokenEnv": "Please set the VITE_MAPBOX_ACCESS_TOKEN environment variable."
   },
   "errors": {
     "general": "An error occurred",

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Search, PlusCircle, User, LogOut, Building2, Settings } from 'lucide-react'
+import { Home, Search, PlusCircle, User, LogOut, Building2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../contexts/I18nContext'
 import { LanguageSwitcher } from './LanguageSwitcher'
